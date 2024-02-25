@@ -2,6 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+def get_number_of_pages():
+    url="https://www.macpweb.org/physios/"
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    last_page_link = soup.find("a", class_="data_pager_next data_pager_button")['href'].split('page=')[1]
+    return int(last_page_link)
+    
+
 all_links = []
 profiles = {
     "profile_url": [],
@@ -16,7 +24,9 @@ profiles = {
     'address': []
 }
 
-for page in range(1, 73):
+pages_count=get_number_of_pages()
+    
+for page in range(1,pages_count):
     url = f"https://www.macpweb.org/physios/?page={page}"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
@@ -100,6 +110,7 @@ for page in range(1, 73):
                 pass
     except:
         pass
-#print(profiles)
+
 df = pd.DataFrame(profiles)
 df.to_csv('Physiotherapy2.csv', index=False)
+print("Finished Successfully.....")
